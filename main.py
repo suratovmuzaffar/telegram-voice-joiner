@@ -1,36 +1,24 @@
-from telethon.sync import TelegramClient
-from telethon.tl.functions.channels import InviteToChannelRequest
-from telethon.tl.functions.contacts import ImportContactsRequest
-from telethon.tl.types import InputPhoneContact
+from telethon import TelegramClient
+import asyncio
 
 api_id = 23892150
 api_hash = 'c7582ccfdb35aaadfe4224e3d73d5d66'
-phone = '+998XXYYYYYYY'  # Telefon raqamingiz
+phone = '+998333439909'  # Telefon raqamingizni kiriting
 
-client = TelegramClient('session_name', api_id, api_hash)
+client = TelegramClient('session', api_id, api_hash)
 
 async def main():
     await client.start(phone)
 
-    # Guruh username (masalan: 'uzbek_chat') - faqat @ dan keyingi qismi
-    group_username = 'BRAWL_STARS_CHAT'
-    group = await client.get_entity(group_username)
+    print("Sizning guruhlaringiz ro'yxati:")
+    dialogs = await client.get_dialogs()
 
-    # Foydalanuvchini telefon raqami orqali kontakt sifatida qo‘shish
-    contact = InputPhoneContact(
-        client_id=0,
-        phone='+998ZZZZZZZZZ',  # Bu foydalanuvchining raqami
-        first_name='Name',
-        last_name=''
-    )
-    result = await client(ImportContactsRequest([contact]))
-    user = result.users[0]
+    for dialog in dialogs:
+        if dialog.is_group or dialog.is_channel:
+            # Faqat guruh va kanallarni chiqaramiz
+            print(f"- {dialog.name} (ID: {dialog.id})")
 
-    # Kanal yoki megagroupga qo‘shish
-    await client(InviteToChannelRequest(
-        channel=group,
-        users=[user]
-    ))
+    print("Ro'yxat chiqarildi.")
 
 with client:
     client.loop.run_until_complete(main())
